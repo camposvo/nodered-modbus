@@ -1,0 +1,13 @@
+{
+  "name": "my-node",
+  "version": "1.0.0",
+  "description": "Example custom node",
+  "main": "my-node.js",  
+  "author": "Victor",
+  "license": "ISC",
+  "node-red" : {
+        "nodes": {
+            "my-node": "my-node.js"
+        }
+    }
+}

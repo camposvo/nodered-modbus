@@ -1,0 +1,27 @@
+<script type="text/javascript">
+    RED.nodes.registerType('my-node',{
+        category: 'demo',
+        color: '#a6bbcf',
+        defaults: {
+            name: {value:""}
+        },
+        inputs: 1,
+        outputs: 1,
+        icon: "file.svg",
+        label: function() {
+            return this.name||"my-node";
+        }
+    });
+</script>
+
+<script type="text/html" data-template-name="my-node">
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+</script>
+
+<script type="text/html" data-help-name="my-node">
+    <p>A simple node that converts the message payloads into all ribeModbus characters</p>
+</script>
+
