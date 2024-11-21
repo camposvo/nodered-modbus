@@ -1,0 +1,35 @@
+[
+    {
+      "disp_id": "177a081c-e57a-4734-8e41-b0a87bf621ad",
+      "disp_nombre": "VMUC-TTN-5",
+      "disp_direccion_ip": "10.10.5.197",
+      "disp_port": 502,
+      "disp_instrumentos": [
+        {
+          "inst_id": "6bacbf98-9da1-4f63-b30f-3282476b8e7f",
+          "inst_nombre": "MEF-TTN-137",
+          "inst_modbus_id": 15,
+          "inst_inicio": 1, 
+          "inst_cantidad": 20,
+          "inst_periodo_scan_ms": 3000,
+          "inst_puntos": [
+            {
+              "punt_id": "98088313-22c7-4eb5-8fd0-6b6d59978919",
+              "punt_vari_name": "Voltaje L1",
+              "punt_tipo": "flotante",
+              "punt_palabras": 2,
+              "punt_direccion_modbus": 9
+            },
+            {
+              "punt_id": "ddf62bdd-8e22-4ca2-9ecf-d3072909a6ff",
+              "punt_vari_name": "Voltaje L2-L3",
+              "punt_tipo": "flotante",
+              "punt_palabras": 2,
+              "punt_direccion_modbus": 11
+            }
+          ]
+         
+        }
+      ]
+    }
+  ]
