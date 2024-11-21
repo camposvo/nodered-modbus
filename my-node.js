@@ -37,9 +37,9 @@ module.exports = function (RED) {
 			if (msg.topic) {
 				console.log("Star Conections");
 				devices.forEach(device => {
-					const { ipAddress, port, unitId, startingRegister, quantityOfRegisters, scanInterval, deviceId } = device;
+					const { disp_id} = device;
 	
-					if (!activeConnections[deviceId]) {
+					if (!activeConnections[disp_id]) {
 						createModbusConnection(device);
 					}				
 				});	
@@ -57,44 +57,52 @@ module.exports = function (RED) {
 		});
 
 		function createModbusConnection(device) {
-			const { ipAddress, port, unitId, startingRegister, quantityOfRegisters, scanInterval, deviceId } = device;
+			const { disp_id, disp_nombre, disp_direccion_ip, disp_port, disp_instrumentos } = device;
 			const net = require('net')
 			const socket = new net.Socket();
 			const options = {
-				'host': ipAddress,
-				'port': port
+				'host': disp_direccion_ip,
+				'port': disp_port
 			};
 
-			const client = new Modbus.client.TCP(socket, unitId);
-			const client2 = new Modbus.client.TCP(socket, 10);
+
+			
+
+
+			disp_instrumentos.forEach(instrument => {
+				const { inst_id, inst_nombre, inst_modbus_id, inst_inicio,  inst_cantidad, inst_periodo_scan_ms, inst_puntos } = instrument;
+
+				const client = new Modbus.client.TCP(socket, inst_modbus_id);
+
+				activeConnections[disp_id] = {
+					client,
+					socket,
+					interval: setInterval(() => readRegistersForDevice(disp_id, disp_nombre, client, instrument), inst_periodo_scan_ms)
+				};
+							
+			});	
+
 			
 
 			socket.connect(options);
 
-			// Initial read and periodic reads, and store active Conections
-			activeConnections[deviceId] = {
-				client,
-				socket,
-				interval: setInterval(() => readRegistersForDevice(client, device), scanInterval)
-			};
-
-			activeConnections[deviceId] = {
-				client2,
-				socket,
-				interval: setInterval(() => readRegistersForDevice(client2, device), scanInterval)
-			};
-
 		}
 
 		// Function to read registers for a specific device
-		function readRegistersForDevice(client, deviceConfig) {
-			client.readHoldingRegisters(deviceConfig.startingRegister, deviceConfig.quantityOfRegisters)
+		function readRegistersForDevice(disp_id, disp_nombre, client, instrument) {
+
+			const { inst_id, inst_nombre, inst_modbus_id, inst_inicio,  inst_cantidad, inst_periodo_scan_ms, inst_puntos } = instrument;
+			
+			client.readHoldingRegisters(instrument.inst_inicio, instrument.inst_cantidad)
 				.then(function (resp) {
-					console.log(`Received data from ${deviceConfig.ipAddress}:${deviceConfig.port}:`, resp.response._body.valuesAsArray);
+					console.log(`Received data from ${disp_nombre}:${instrument.inst_nombre}:`, resp.response._body.valuesAsArray);
 
 					const msg = {
 						payload: {
-							deviceId: deviceConfig.deviceId,
+							disp_id: disp_id,
+							disp_nombre: disp_nombre,
+							inst_id: inst_id,
+							inst_nombre: inst_nombre,
 							data: resp.response._body.valuesAsArray
 						}
 					}
@@ -102,7 +110,7 @@ module.exports = function (RED) {
 					node.send(msg);
 				})
 				.catch(function (err) {
-					console.error(`Error reading registers from ${deviceConfig.ipAddress}:${deviceConfig.port}:`, err);
+					console.error(`Error reading registers from ${instrument.ipAddress}:${instrument.port}:`, err);
 					// Handle errors, e.g., reconnect
 				});
 		}
